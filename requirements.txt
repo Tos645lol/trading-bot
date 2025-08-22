@@ -1,0 +1,6 @@
+yfinance
+pandas
+numpy
+feedparser
+python-telegram-bot
+openai
