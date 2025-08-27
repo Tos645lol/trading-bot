@@ -12,18 +12,12 @@ from zoneinfo import ZoneInfo
 from openai import OpenAI
 
 # ============== CONFIGURAZIONE ==============
-# LE CHIAVI ORA DEVONO ESSERE NELLE VARIABILI D'AMBIENTE
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-# Lista titoli da analizzare
 STOCKS = ["SOUN", "RXRX", "PLTR", "AIQ"]
-
-# Fuso orario
 TZ = ZoneInfo("Europe/Rome")
-
-# ============== OPENAI CLIENT ==============
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # ============== ANALISI TECNICA (RSI) ==============
@@ -39,14 +33,14 @@ def calculate_RSI(series, period=14):
 
 def get_stock_signal(ticker):
     try:
-        data = yf.download(ticker, period="2mo", interval="1d", progress=False)
+        data = yf.download(ticker, period="2mo", interval="1d", progress=False, auto_adjust=True)
         if data.empty or len(data) < 20:
             return None, None, "⚠️ Dati insufficienti"
 
         data["RSI"] = calculate_RSI(data["Close"])
-        last_rsi = float(data["RSI"].iloc[-1])
-        last_close = float(data["Close"].iloc[-1])
-        prev_close = float(data["Close"].iloc[-2])
+        last_rsi = data["RSI"].iloc[-1].item()
+        last_close = data["Close"].iloc[-1].item()
+        prev_close = data["Close"].iloc[-2].item()
 
         signal = "Aspetta"
         if last_rsi < 30 and last_close < prev_close:
